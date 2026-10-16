@@ -9,75 +9,57 @@
 
 using namespace std;
 
-int main() { 
+int main() {
   double pi;
-  double tubeLength, insideDiameter, waterDensity, kinematicViscosity;
-  double reynoldsNumber, frictionCoefficient, pressureLoss, power, volumeFlow;
-  double averageSpeed;
-  int stepCount;
+  double l, d, p, v, w;
+  double Re, lambda, deltaP, P, Q;
+  double millimetrInMeter;
+  int stepCount, decimalPlaces;
 
-  cout << "Enter tube length: ";
-  cin >> tubeLength;
+  cout << "Enter tube length, m: ";
+  cin >> l;
 
-  cout << "Enter inside diameter: ";
-  cin >> insideDiameter;
+  cout << "Enter inside diameter, mm: ";
+  cin >> d;
 
   cout << "Enter water density: ";
-  cin >> waterDensity;
+  cin >> p;
 
   cout << "Enter kinematic viscosity: ";
-  cin >> kinematicViscosity;
-	
+  cin >> v;
+
+  cout << "Enter number of speed values: ";
+  cin >> stepCount;
+
+  decimalPlaces = 6;
+  millimetrInMeter = 1000.0;
+  pi = acos(-1.0);
+  d = d / millimetrInMeter;
+
+  cout << fixed << setprecision(decimalPlaces);
   cout << "w, m/s \t\tRe \t\tlambda \t\tdelta p, Pa \tP, W\n";
 
-  cout << fixed << setprecision(6);
-
-  insideDiameter = insideDiameter / 1000.0;
-  stepCount = 7;
-  pi = acos(-1.0);
-
   for (int stepIndex = 0; stepIndex < stepCount; ++stepIndex) {
-	switch (stepIndex) {
-	  case 0:
-		averageSpeed = 0.02;
-		break;
-	  case 1:
-		averageSpeed = 0.05;
-		break;
-	  case 2:
-		averageSpeed = 0.1;
-		break;
-	  case 3:
-		averageSpeed = 0.2;
-		break;
-	  case 4:
-		averageSpeed = 0.4;
-		break;
-	  case 5:
-		averageSpeed = 0.6;
-		break;
-	  case 6:
-		averageSpeed = 1.0;
-		break;
+    cout << "Enter average speed: ";
+	cin >> w;
+
+	Re = (w * d) / v;
+
+	if (Re < 2300.0) {
+	  lambda = 64.0 / Re;
+	} else if (Re >= 4000.0) {
+	  lambda = 0.3164 / pow(Re, 0.25);
 	}
 
-	reynoldsNumber = (averageSpeed * insideDiameter) / kinematicViscosity;
+	deltaP = (lambda * l * p * pow(w, 2.0)) / (d * 2.0);
+	Q = (pi * pow(d, 2.0) * w) / 4.0;
+	P = deltaP * Q;
 
-	if (reynoldsNumber < 2300.0) {
-	  frictionCoefficient = 64.0 / reynoldsNumber;
-	} else if (reynoldsNumber >= 4000.0) {
-	  frictionCoefficient = 0.3164 / pow(reynoldsNumber, 0.25);
-	}
-
-	pressureLoss = (frictionCoefficient * tubeLength * waterDensity * pow(averageSpeed, 2.0)) / (insideDiameter * 2.0);
-    volumeFlow = (pi * pow(insideDiameter, 2.0) * averageSpeed) / 4.0;
-	power = pressureLoss * volumeFlow;
-		
-	cout << averageSpeed
-		 << "\t" << reynoldsNumber
-		 << "\t" << frictionCoefficient
-		 << "\t" << pressureLoss
-		 << "\t" << power << "\n";
+	cout << w
+		 << "\t" << Re
+		 << "\t" << lambda
+		 << "\t" << deltaP
+		 << "\t" << P << "\n";
   }
 
   return 0;
